@@ -34,13 +34,19 @@ app.get('/about', (req,res) => {
 
 app.post('/', (req,res)=>{
 	const item = req.body.newItem;
-	if(req.body.list === 'Work'){
+
+	if(item === '' || item === ' '){
+		console.log('empty');
+	}else{
+		if(req.body.list === 'Work'){
 		workItems.push(item);
 		res.redirect('/work');
 	}else{
 		items.push(item);	
 		res.redirect('/');
 	}
+	}
+	
 })
 
 app.post('/work',(req,res)=>{
