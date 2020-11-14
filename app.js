@@ -6,7 +6,7 @@ const ejs = require('ejs');
 
 const app = express();
 const port = 3000;
-var items= [];
+let items= [];
 
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -30,7 +30,7 @@ app.get('/', (req,res) =>{
 
 
 app.post('/', (req,res)=>{
-	var item = req.body.newItem;
+	let item = req.body.newItem;
 
 	items.push(item);
 
