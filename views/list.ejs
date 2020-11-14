@@ -5,11 +5,20 @@
 </head>
 <body>
 
-	<%  if(kindOfDay === 'Saturday' || kindOfDay === 'Sunday'){ %>
-		<h1 style="color:purple"><%= kindOfDay %> List</h1>
-	<% }else{ %>
-		<h1 style="color:red"><%= kindOfDay %> List</h1>
-	<% } %>
-	<p>Why are you running</p>
+	<h1><%= kindOfDay %></h1>
+
+	<ul>
+		
+		<% for(var i = 0; i < newListItem.length; i++ ){ %>
+			<li> <%= newListItem[i] %> </li>
+		<% } %>
+		 
+	</ul>
+	<form method="post" action="/">
+		<input type="text" name="newItem">
+		<button type="submit" name="button">Add</button>
+	</form>
 </body>
 </html>
+
+
