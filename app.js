@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({
 app.use(express.static('public'));
 
 // mongo db
-mongoose.connect('mongodb://localhost:27017/todolistDB', {
+mongoose.connect('mongodb+srv://admin-eldor:Panda1999.@cluster0.stja3.mongodb.net/todolistDB', {
     useNewUrlParser: true
 }, {
     useUnifiedTopology: true
@@ -44,7 +44,12 @@ const item3 = new Item({
 
 const defaultItems = [item1, item2, item3];
 
+const ListSchema = {
+	name: String,
+	items: [itemSchema]
+};
 
+const List = mongoose.model("List", itemSchema);
 
 app.set('view engine', 'ejs');
 
@@ -74,11 +79,29 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/work', (req, res) => {
-    res.render('list', {
-        listTitle: 'Work List',
-        newListItem: workItems
-    });
+app.get('/:customListName', (req, res) => {
+	const customListName = req.params.customListName;
+
+	List.findOne({name: customListName}, (err, foundList) => {
+		if(!err){
+			if(!foundList){
+				// Create a new list
+					const list = new List({
+					name: customListName,
+					items: defaultItems
+				});
+
+				list.save();
+				res.redirect('/');
+			}else{
+				// Show an exist list
+				res.render('list', {listTitle: foundList.name, newListItem: foundList.items})
+			}
+		}
+	});
+
+
+
 });
 
 app.get('/about', (req, res) => {
