@@ -3,58 +3,107 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
-const date = require(__dirname + '/date.js');
+const mongoose = require('mongoose');
 
 const app = express();
 const port = 3000;
-const items= [];
-const workItems = [];
 
-app.use(bodyParser.urlencoded({extended: true}));
+
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(express.static('public'));
 
-app.set('view engine','ejs');
+// mongo db
+mongoose.connect('mongodb://localhost:27017/todolistDB', {
+    useNewUrlParser: true
+}, {
+    useUnifiedTopology: true
+});
 
-app.get('/', (req,res) =>{
+// mongoose schema
+const itemSchema = new mongoose.Schema({
+    name: String
+});
 
-	const day = date();
+// mogoose model
+const Item = mongoose.model("Item", itemSchema);
 
-	res.render('list', {listTitle: day, newListItem: items});
+const item1 = new Item({
+    name: 'Fuck this shit'
+});
+
+const item2 = new Item({
+    name: 'sleep'
+});
+
+const item3 = new Item({
+    name: 'eat'
+});
+
+const defaultItems = [item1, item2, item3];
+
+
+
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res) => {
+
+    Item.find({}, (err, result) => {
+
+        if (result.length === 0) {
+            Item.insertMany(defaultItems, (err) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log('default items was added');
+                }
+            });
+            res.redirect('/');
+        } else {
+            res.render('list', {
+                listTitle: 'Today',
+                newListItem: result
+            });
+        }
+    });
+
+
 
 });
 
 
-app.get('/work', (req,res) => {
-	res.render('list', {listTitle: 'Work List', newListItem: workItems});
+app.get('/work', (req, res) => {
+    res.render('list', {
+        listTitle: 'Work List',
+        newListItem: workItems
+    });
 });
 
-app.get('/about', (req,res) => {
-	res.render('about');
+app.get('/about', (req, res) => {
+    res.render('about');
 });
 
-app.post('/', (req,res)=>{
-	const item = req.body.newItem;
+app.post('/', (req, res) => {
+    const itemName = req.body.newItem;
 
-	if(item === '' || item === ' '){
-		console.log('empty');
-	}else{
-		if(req.body.list === 'Work'){
-		workItems.push(item);
-		res.redirect('/work');
-	}else{
-		items.push(item);	
-		res.redirect('/');
-	}
-	}
-	
+    const item = new Item({
+    	name: itemName
+    });
+   
+   item.save();
+
+   res.redirect('/');
+
 })
 
-app.post('/work',(req,res)=>{
-	const item = req.body.newItem;
-	workItems.push(item);
-	res.redirect('/work');
+app.post('/work', (req, res) => {
+    const item = req.body.newItem;
+    workItems.push(item);
+    res.redirect('/work');
 });
 
-app.listen(port, ()=>{
-	console.log('Server started on port ' + port);
+app.listen(port, () => {
+    console.log('Server started on port ' + port);
 });
