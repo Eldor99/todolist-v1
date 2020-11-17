@@ -104,6 +104,18 @@ app.post('/work', (req, res) => {
     res.redirect('/work');
 });
 
+app.post('/delete', (req,res)=>{
+	const checkedItemId = req.body.checkbox;
+	Item.findByIdAndRemove(checkedItemId, (err)=>{
+		if(err){
+			console.log(err);
+		}else{
+			console.log('successfuly deleted item');
+			res.redirect('/');
+		}
+	});
+});
+
 app.listen(port, () => {
     console.log('Server started on port ' + port);
 });
